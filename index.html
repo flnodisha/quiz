@@ -732,12 +732,6 @@
             const quizContent = document.getElementById('quizContent');
             
             let quizHtml = `
-                <div class="quiz-header">
-                    <div class="quiz-subtitle">${formatDisplayDate(selectedDate)}</div>
-                    <div class="progress-container">
-                        <div class="progress-bar" id="progressBar"></div>
-                    </div>
-                </div>
                 <div class="quiz-slides" id="quizSlides">
             `;
             
@@ -790,7 +784,6 @@
             `;
             
             quizContent.innerHTML = quizHtml;
-            updateProgress();
         }
 
         function selectOption(slideIndex, optionIndex) {
@@ -879,12 +872,7 @@
         }
 
         function updateProgress() {
-            const answeredQuestions = userAnswers.filter(answer => answer !== null).length;
-            const progressPercentage = (answeredQuestions / currentQuizzes.length) * 100;
-            const progressBar = document.getElementById('progressBar');
-            if (progressBar) {
-                progressBar.style.width = progressPercentage + '%';
-            }
+            // Progress bar removed - no longer needed
         }
 
         function showScoreboard() {
