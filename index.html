@@ -507,25 +507,89 @@
             .quiz-container {
                 margin: 0 5px;
                 border-radius: 20px;
-                min-height: 550px;
+                min-height: 600px;
             }
             
             .quiz-slides {
-                height: 450px;
+                height: 500px;
             }
             
             .quiz-slide {
-                padding: 25px 20px;
+                padding: 20px 15px;
+                height: 100%;
+                overflow-y: auto;
+            }
+            
+            .question-content {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+                padding-bottom: 80px; /* Space for navigation */
+            }
+            
+            .quiz-options {
+                flex: 1;
+                margin-bottom: 15px;
+            }
+            
+            .quiz-option {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+                gap: 12px;
+            }
+            
+            .option-circle {
+                width: 20px;
+                height: 20px;
+            }
+            
+            .option-letter {
+                font-size: 0.75rem;
+            }
+            
+            .slide-navigation {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 15px;
+                border-top: 1px solid #e2e8f0;
+                margin-top: 0;
+                border-radius: 0 0 20px 20px;
+                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+            }
+            
+            .nav-btn {
+                min-width: 65px;
+                padding: 10px 12px;
+                font-size: 0.8rem;
+                height: 40px;
+            }
+            
+            .question-indicator {
+                font-size: 0.75rem;
+                flex: 1;
+                padding: 0 10px;
             }
             
             .content {
                 padding: 15px 10px 25px 10px;
             }
             
-            .nav-btn {
-                min-width: 70px;
-                padding: 10px 15px;
-                font-size: 0.85rem;
+            .quiz-question {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+            
+            .question-number {
+                width: 30px;
+                height: 30px;
+                line-height: 30px;
+                font-size: 0.8rem;
+                margin-bottom: 15px;
             }
         }
     </style>
