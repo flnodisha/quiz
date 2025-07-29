@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quiz Reader</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 25px 0 20px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            text-align: center;
+            color: #1a1a2e;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-shadow: none;
+            letter-spacing: -0.5px;
+        }
+
+        .date-navigation {
+            display: flex;
+            justify-content: center;
+            padding: 0 15px;
+            margin-bottom: 5px;
+        }
+
+        .date-scroll {
+            display: flex;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            gap: 12px;
+            padding: 15px 5px;
+            max-width: 100%;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .date-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .date-btn {
+            min-width: 90px;
+            height: 48px;
+            padding: 0 18px;
+            border: none;
+            border-radius: 24px;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            color: #1a1a2e;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            white-space: nowrap;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            user-select: none;
+        }
+
+        .date-btn:hover:not(.disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 30px rgba(26, 26, 46, 0.2);
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            color: white;
+        }
+
+        .date-btn:active:not(.disabled) {
+            transform: translateY(0);
+            transition: all 0.1s;
+        }
+
+        .date-btn.active {
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            color: white;
+            transform: scale(1.02);
+            box-shadow: 0 8px 35px rgba(26, 26, 46, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .date-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: #e9ecef;
+            color: #adb5bd;
+            transform: none;
+        }
+
+        .content {
+            max-width: 100%;
+            margin: 0;
+            padding: 20px 15px 30px 15px;
+        }
+
+        .quiz-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin: 0 auto;
+            max-width: 500px;
+        }
+
+        .quiz-date {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #1a1a2e;
+            letter-spacing: -0.3px;
+        }
+
+        .question-container {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border: 2px solid rgba(26, 26, 46, 0.1);
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #1a1a2e;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .quiz-option {
+            padding: 12px 16px;
+            border: 2px solid rgba(26, 26, 46, 0.1);
+            border-radius: 10px;
+            background: #ffffff;
+            color: #1a1a2e;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-letter {
+            background: rgba(26, 26, 46, 0.1);
+            color: #1a1a2e;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .quiz-option:hover {
+            border-color: #1a1a2e;
+            background: rgba(26, 26, 46, 0.05);
+        }
+
+        .quiz-option.selected {
+            background: #1a1a2e;
+            color: white;
+            border-color: #1a1a2e;
+        }
+
+        .quiz-option.selected .option-letter {
+            background: white;
+            color: #1a1a2e;
+        }
+
+        .quiz-option.correct {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+        }
+
+        .quiz-option.correct .option-letter {
+            background: white;
+            color: #48bb78;
+        }
+
+        .quiz-option.wrong {
+            background: #e53e3e;
+            color: white;
+            border-color: #e53e3e;
+        }
+
+        .quiz-option.wrong .option-letter {
+            background: white;
+            color: #e53e3e;
+        }
+
+        .quiz-submit {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .quiz-submit:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(26, 26, 46, 0.3);
+        }
+
+        .quiz-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .quiz-result {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .quiz-result.correct {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2f855a;
+            border: 2px solid rgba(72, 187, 120, 0.3);
+        }
+
+        .quiz-result.wrong {
+            background: rgba(229, 62, 62, 0.1);
+            color: #c53030;
+            border: 2px solid rgba(229, 62, 62, 0.3);
+        }
+
+        .quiz-score {
+            text-align: center;
+            background: linear-gradient(145deg, #1a1a2e, #16213e);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .score-details {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px 20px;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+            font-weight: 500;
+        }
+
+        .error {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 1rem;
+            color: #e53e3e;
+            background: rgba(229, 62, 62, 0.08);
+            border-radius: 12px;
+            border: 2px solid rgba(229, 62, 62, 0.15);
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+                margin-bottom: 20px;
+            }
+            
+            .date-btn {
+                min-width: 85px;
+                height: 44px;
+                font-size: 0.8rem;
+                padding: 0 15px;
+            }
+            
+            .quiz-container {
+                padding: 20px 15px;
+                border-radius: 16px;
+                margin: 0;
+            }
+            
+            .quiz-question {
+                font-size: 1.05rem;
+            }
+            
+            .content {
+                padding: 15px 10px 25px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .date-btn {
+                min-width: 80px;
+                height: 42px;
+                font-size: 0.75rem;
+            }
+            
+            .question-container {
+                padding: 18px;
+                margin-bottom: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🧠 Daily Quiz</h1>
+        <div class="date-navigation">
+            <div class="date-scroll" id="dateScroll"></div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="quiz-container">
+            <div id="quizContent">
+                <div class="loading">Loading quiz...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuizzes = [];
+        let quizResults = {};
+
+        // Get current date in Indian Standard Time (IST)
+        const now = new Date();
+        const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC+5:30
+        const todayLocal = new Date(now.getTime() + istOffset);
+        let selectedDate = formatDate(todayLocal);
+        
+        function formatDate(date) {
+            // Use IST date components
+            const year = date.getUTCFullYear();
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        function formatDisplayDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('en-IN', { 
+                weekday: 'short', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        function generateDates() {
+            const dates = [];
+            const startDate = new Date(todayLocal.getTime());
+            startDate.setUTCDate(todayLocal.getUTCDate() - 7); // 7 days before today
+            
+            for (let i = 0; i < 15; i++) { // 7 days before + today + 7 days after
+                const date = new Date(startDate.getTime());
+                date.setUTCDate(startDate.getUTCDate() + i);
+                
+                const dateStr = formatDate(date);
+                const todayStr = formatDate(todayLocal);
+                
+                dates.push({
+                    value: dateStr,
+                    display: formatDisplayDate(dateStr),
+                    isPast: dateStr < todayStr,
+                    isToday: dateStr === todayStr,
+                    isFuture: dateStr > todayStr
+                });
+            }
+            return dates;
+        }
+        
+        function createDateNavigation() {
+            const dateScroll = document.getElementById('dateScroll');
+            const dates = generateDates();
+            
+            dates.forEach(dateInfo => {
+                const btn = document.createElement('button');
+                btn.className = 'date-btn';
+                btn.textContent = dateInfo.display;
+                btn.dataset.date = dateInfo.value;
+                
+                if (dateInfo.isFuture) {
+                    btn.classList.add('disabled');
+                } else {
+                    btn.addEventListener('click', () => selectDate(dateInfo.value));
+                }
+                
+                if (dateInfo.isToday) {
+                    btn.classList.add('active');
+                }
+                
+                dateScroll.appendChild(btn);
+            });
+            
+            // Center the current date
+            setTimeout(() => {
+                const activeBtn = dateScroll.querySelector('.active');
+                if (activeBtn) {
+                    activeBtn.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+                }
+            }, 100);
+        }
+        
+        async function loadQuizForDate(date) {
+            const quizContent = document.getElementById('quizContent');
+            quizContent.innerHTML = '<div class="loading">Loading quiz...</div>';
+            
+            try {
+                const response = await fetch(`quiz-${date}.json`);
+                
+                if (!response.ok) {
+                    throw new Error('Quiz file not found');
+                }
+                
+                const quizData = await response.json();
+                currentQuizzes = quizData.questions || [];
+                quizResults = {};
+                
+                displayQuiz();
+            } catch (error) {
+                quizContent.innerHTML = `
+                    <div class="error">
+                        <h3>No quiz available for ${formatDisplayDate(date)}</h3>
+                        <p>The quiz file for this date hasn't been created yet.</p>
+                        <p><small>Expected file: quiz-${date}.json</small></p>
+                    </div>
+                `;
+            }
+        }
+
+        function displayQuiz() {
+            const quizContent = document.getElementById('quizContent');
+            let quizHtml = `<div class="quiz-date">Daily Quiz - ${formatDisplayDate(selectedDate)}</div>`;
+            
+            currentQuizzes.forEach((quiz, index) => {
+                quizHtml += `
+                    <div class="question-container" data-quiz-id="${index}">
+                        <div class="question-number">${index + 1}</div>
+                        <div class="quiz-question">${quiz.question}</div>
+                        <div class="quiz-options">
+                            ${quiz.options.map((option, optIndex) => `
+                                <div class="quiz-option" data-option="${optIndex}" onclick="selectOption(${index}, ${optIndex})">
+                                    <div class="option-letter">${String.fromCharCode(65 + optIndex)}</div>
+                                    <div>${option}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="quiz-submit" onclick="submitAnswer(${index})" disabled>
+                            Submit Answer
+                        </button>
+                        <div class="quiz-result" id="result-${index}" style="display: none;"></div>
+                    </div>
+                `;
+            });
+            
+            // Add overall score section
+            quizHtml += `<div class="quiz-score" id="overallScore" style="display: none;"></div>`;
+            
+            quizContent.innerHTML = quizHtml;
+        }
+
+        function selectOption(quizIndex, optionIndex) {
+            const quizContainer = document.querySelector(`[data-quiz-id="${quizIndex}"]`);
+            const options = quizContainer.querySelectorAll('.quiz-option');
+            const submitBtn = quizContainer.querySelector('.quiz-submit');
+            
+            // Remove previous selection
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Select current option
+            options[optionIndex].classList.add('selected');
+            
+            // Enable submit button
+            submitBtn.disabled = false;
+            
+            // Store selection
+            quizResults[quizIndex] = { selected: optionIndex, submitted: false };
+        }
+
+        function submitAnswer(quizIndex) {
+            const quiz = currentQuizzes[quizIndex];
+            const result = quizResults[quizIndex];
+            const quizContainer = document.querySelector(`[data-quiz-id="${quizIndex}"]`);
+            const options = quizContainer.querySelectorAll('.quiz-option');
+            const submitBtn = quizContainer.querySelector('.quiz-submit');
+            const resultDiv = document.getElementById(`result-${quizIndex}`);
+            
+            if (!result || result.submitted) return;
+            
+            // Mark as submitted
+            result.submitted = true;
+            result.correct = result.selected === quiz.correctAnswer;
+            
+            // Show correct/wrong styling
+            options[quiz.correctAnswer].classList.add('correct');
+            if (result.selected !== quiz.correctAnswer) {
+                options[result.selected].classList.add('wrong');
+            }
+            
+            // Disable all options and submit button
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitted';
+            
+            // Show result
+            resultDiv.style.display = 'block';
+            if (result.correct) {
+                resultDiv.className = 'quiz-result correct';
+                resultDiv.innerHTML = '✅ Correct! Well done!';
+            } else {
+                resultDiv.className = 'quiz-result wrong';
+                resultDiv.innerHTML = `❌ Wrong! The correct answer is: ${quiz.options[quiz.correctAnswer]}`;
+            }
+            
+            // Show explanation if available
+            if (quiz.explanation) {
+                resultDiv.innerHTML += `<br><small><strong>Explanation:</strong> ${quiz.explanation}</small>`;
+            }
+            
+            updateOverallScore();
+        }
+
+        function updateOverallScore() {
+            const submittedAnswers = Object.values(quizResults).filter(r => r.submitted);
+            const totalQuestions = currentQuizzes.length;
+            
+            if (submittedAnswers.length === totalQuestions) {
+                const correctAnswers = submittedAnswers.filter(r => r.correct).length;
+                const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+                
+                let performance = '';
+                if (percentage >= 90) performance = '🏆 Excellent!';
+                else if (percentage >= 75) performance = '🎯 Great Job!';
+                else if (percentage >= 60) performance = '👍 Good Work!';
+                else performance = '📚 Keep Learning!';
+                
+                const scoreDiv = document.getElementById('overallScore');
+                scoreDiv.style.display = 'block';
+                scoreDiv.innerHTML = `
+                    ${performance}<br>
+                    <div class="score-details">Score: ${correctAnswers}/${totalQuestions} (${percentage}%)</div>
+                `;
+            }
+        }
+        
+        function selectDate(date) {
+            // Update active button
+            document.querySelectorAll('.date-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.date === date) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            selectedDate = date;
+            currentQuizzes = [];
+            quizResults = {};
+            
+            loadQuizForDate(date);
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Debug: Log current IST date info
+            console.log('Current IST date:', todayLocal);
+            console.log('Formatted today (IST):', selectedDate);
+            console.log('IST Time:', todayLocal.toUTCString());
+            
+            createDateNavigation();
+            loadQuizForDate(selectedDate);
+        });
+    </script>
+</body>
+</html>
