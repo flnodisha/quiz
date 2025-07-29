@@ -131,7 +131,7 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             margin: 0 auto;
             max-width: 450px;
-            min-height: 500px;
+            min-height: 600px;
             position: relative;
             overflow: hidden;
         }
@@ -173,7 +173,7 @@
 
         .quiz-slides {
             position: relative;
-            height: 400px;
+            height: 500px;
             overflow: hidden;
         }
 
@@ -189,7 +189,7 @@
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-start;
         }
 
         .quiz-slide.active {
@@ -203,6 +203,9 @@
 
         .question-content {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
 
         .question-number {
@@ -217,6 +220,7 @@
             font-size: 0.9rem;
             font-weight: 700;
             margin-bottom: 20px;
+            flex-shrink: 0;
         }
 
         .quiz-question {
@@ -225,6 +229,7 @@
             color: #333;
             margin-bottom: 25px;
             line-height: 1.5;
+            flex-shrink: 0;
         }
 
         .quiz-options {
@@ -232,6 +237,7 @@
             flex-direction: column;
             gap: 12px;
             margin-bottom: 25px;
+            flex: 1;
         }
 
         .quiz-option {
@@ -299,7 +305,10 @@
             justify-content: space-between;
             align-items: center;
             gap: 15px;
-            margin-top: auto;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .nav-btn {
@@ -312,6 +321,10 @@
             transition: all 0.2s ease;
             -webkit-tap-highlight-color: transparent;
             min-width: 80px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .nav-btn.prev {
@@ -323,11 +336,13 @@
         .nav-btn.prev:hover:not(:disabled) {
             background: #edf2f7;
             border-color: #cbd5e0;
+            transform: translateY(-1px);
         }
 
         .nav-btn.next {
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
+            border: 2px solid transparent;
         }
 
         .nav-btn.next:hover:not(:disabled) {
@@ -338,13 +353,15 @@
         .nav-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
+            transform: none !important;
+            box-shadow: none !important;
         }
 
         .question-indicator {
             font-size: 0.8rem;
             color: #718096;
             text-align: center;
+            flex: 1;
         }
 
         /* Scoreboard Styles */
@@ -352,6 +369,12 @@
             padding: 30px;
             text-align: center;
             display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
         }
 
         .scoreboard-slide.active {
@@ -390,7 +413,7 @@
         }
 
         .results-container {
-            max-height: 250px;
+            max-height: 200px;
             overflow-y: auto;
             margin-bottom: 25px;
         }
@@ -484,6 +507,11 @@
             .quiz-container {
                 margin: 0 5px;
                 border-radius: 20px;
+                min-height: 550px;
+            }
+            
+            .quiz-slides {
+                height: 450px;
             }
             
             .quiz-slide {
@@ -492,6 +520,12 @@
             
             .content {
                 padding: 15px 10px 25px 10px;
+            }
+            
+            .nav-btn {
+                min-width: 70px;
+                padding: 10px 15px;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -657,11 +691,11 @@
                         </div>
                         <div class="slide-navigation">
                             <button class="nav-btn prev" onclick="previousSlide()" ${index === 0 ? 'disabled' : ''}>
-                                Previous
+                                ← Previous
                             </button>
                             <div class="question-indicator">${index + 1} of ${currentQuizzes.length}</div>
                             <button class="nav-btn next" onclick="${index === currentQuizzes.length - 1 ? 'showScoreboard()' : 'nextSlide()'}" disabled>
-                                ${index === currentQuizzes.length - 1 ? 'Submit' : 'Next'}
+                                ${index === currentQuizzes.length - 1 ? 'Submit →' : 'Next →'}
                             </button>
                         </div>
                     </div>
@@ -719,6 +753,9 @@
                 
                 currentSlide++;
                 updateProgress();
+                
+                // Update button states for the new slide
+                updateNavigationButtons();
             }
         }
 
@@ -734,7 +771,23 @@
                 
                 currentSlide--;
                 updateProgress();
+                
+                // Update button states for the new slide
+                updateNavigationButtons();
             }
+        }
+
+        function updateNavigationButtons() {
+            const currentSlideEl = document.querySelector(`[data-slide="${currentSlide}"]`);
+            const prevBtn = currentSlideEl.querySelector('.nav-btn.prev');
+            const nextBtn = currentSlideEl.querySelector('.nav-btn.next');
+            
+            // Update previous button
+            prevBtn.disabled = currentSlide === 0;
+            
+            // Update next button based on whether an option is selected
+            const hasAnswer = userAnswers[currentSlide] !== null;
+            nextBtn.disabled = !hasAnswer;
         }
 
         function updateProgress() {
