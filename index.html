@@ -136,30 +136,23 @@
             overflow: hidden;
         }
 
-        .quiz-header {
+        .progress-container {
             background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 20px 25px;
             color: white;
-            padding: 25px;
             text-align: center;
-            position: relative;
         }
 
-        .quiz-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .quiz-subtitle {
+        .progress-info {
             font-size: 0.9rem;
+            margin-bottom: 10px;
             opacity: 0.9;
         }
 
-        .progress-container {
+        .progress-bar-container {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             height: 8px;
-            margin-top: 15px;
             overflow: hidden;
         }
 
@@ -300,6 +293,7 @@
             align-items: center;
             gap: 15px;
             margin-top: auto;
+            padding-top: 20px;
         }
 
         .nav-btn {
@@ -323,6 +317,7 @@
         .nav-btn.prev:hover:not(:disabled) {
             background: #edf2f7;
             border-color: #cbd5e0;
+            transform: translateY(-1px);
         }
 
         .nav-btn.next {
@@ -627,10 +622,9 @@
             const quizContent = document.getElementById('quizContent');
             
             let quizHtml = `
-                <div class="quiz-header">
-                    <div class="quiz-title">Daily Quiz</div>
-                    <div class="quiz-subtitle">${formatDisplayDate(selectedDate)}</div>
-                    <div class="progress-container">
+                <div class="progress-container">
+                    <div class="progress-info" id="progressInfo">${formatDisplayDate(selectedDate)} - Question 1 of ${currentQuizzes.length}</div>
+                    <div class="progress-bar-container">
                         <div class="progress-bar" id="progressBar"></div>
                     </div>
                 </div>
@@ -719,6 +713,7 @@
                 
                 currentSlide++;
                 updateProgress();
+                updateNavigationButtons();
             }
         }
 
@@ -734,15 +729,35 @@
                 
                 currentSlide--;
                 updateProgress();
+                updateNavigationButtons();
             }
+        }
+
+        function updateNavigationButtons() {
+            const currentSlideEl = document.querySelector(`[data-slide="${currentSlide}"]`);
+            const prevBtn = currentSlideEl.querySelector('.nav-btn.prev');
+            const nextBtn = currentSlideEl.querySelector('.nav-btn.next');
+            
+            // Update previous button
+            prevBtn.disabled = currentSlide === 0;
+            
+            // Update next button based on whether current question is answered
+            const hasAnswer = userAnswers[currentSlide] !== null;
+            nextBtn.disabled = !hasAnswer;
         }
 
         function updateProgress() {
             const answeredQuestions = userAnswers.filter(answer => answer !== null).length;
             const progressPercentage = (answeredQuestions / currentQuizzes.length) * 100;
             const progressBar = document.getElementById('progressBar');
+            const progressInfo = document.getElementById('progressInfo');
+            
             if (progressBar) {
                 progressBar.style.width = progressPercentage + '%';
+            }
+            
+            if (progressInfo) {
+                progressInfo.textContent = `${formatDisplayDate(selectedDate)} - Question ${currentSlide + 1} of ${currentQuizzes.length}`;
             }
         }
 
@@ -835,15 +850,10 @@
                 slide.querySelectorAll('.quiz-option').forEach(opt => {
                     opt.classList.remove('selected');
                 });
-                
-                // Reset buttons
-                const nextBtn = slide.querySelector('.nav-btn.next');
-                const prevBtn = slide.querySelector('.nav-btn.prev');
-                nextBtn.disabled = true;
-                prevBtn.disabled = index === 0;
             });
             
             updateProgress();
+            updateNavigationButtons();
         }
 
         function selectDate(date) {
