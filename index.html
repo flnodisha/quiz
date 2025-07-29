@@ -32,17 +32,14 @@
             top: 0;
             z-index: 100;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
         }
 
-        .header h1 {
-            text-align: center;
-            color: #667eea;
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin-bottom: 25px;
-            text-shadow: none;
-            letter-spacing: -0.5px;
+        .header.slide-hidden {
+            transform: translateY(-50%);
         }
+
 
         .date-navigation {
             display: flex;
@@ -209,18 +206,14 @@
         }
 
         .question-number {
-            display: inline-block;
+            display: inline;
             background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 35px;
+            padding: 8px 12px;
+            border-radius: 50px;
             font-size: 0.9rem;
             font-weight: 700;
-            margin-bottom: 20px;
-            flex-shrink: 0;
+            margin-right: 15px;
         }
 
         .quiz-question {
@@ -230,6 +223,9 @@
             margin-bottom: 25px;
             line-height: 1.5;
             flex-shrink: 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
         }
 
         .quiz-options {
@@ -596,7 +592,6 @@
 </head>
 <body>
     <div class="header">
-        <h1>🧠 Daily Quiz</h1>
         <div class="date-navigation">
             <div class="date-scroll" id="dateScroll"></div>
         </div>
@@ -726,7 +721,6 @@
             
             let quizHtml = `
                 <div class="quiz-header">
-                    <div class="quiz-title">Daily Quiz</div>
                     <div class="quiz-subtitle">${formatDisplayDate(selectedDate)}</div>
                     <div class="progress-container">
                         <div class="progress-bar" id="progressBar"></div>
@@ -740,8 +734,10 @@
                 quizHtml += `
                     <div class="quiz-slide ${index === 0 ? 'active' : ''}" data-slide="${index}">
                         <div class="question-content">
-                            <div class="question-number">${index + 1}</div>
-                            <div class="quiz-question">${quiz.question}</div>
+                            <div class="quiz-question">
+                                <span class="question-number">${index + 1}.</span>
+                                ${quiz.question}
+                            </div>
                             <div class="quiz-options">
                                 ${quiz.options.map((option, optIndex) => `
                                     <div class="quiz-option" data-option="${optIndex}" onclick="selectOption(${index}, ${optIndex})">
@@ -820,6 +816,9 @@
                 
                 // Update button states for the new slide
                 updateNavigationButtons();
+                
+                // Slightly hide header when navigating between slides
+                toggleHeaderVisibility();
             }
         }
 
@@ -838,7 +837,20 @@
                 
                 // Update button states for the new slide
                 updateNavigationButtons();
+                
+                // Slightly hide header when navigating between slides
+                toggleHeaderVisibility();
             }
+        }
+
+        function toggleHeaderVisibility() {
+            const header = document.querySelector('.header');
+            header.classList.add('slide-hidden');
+            
+            // Show header again after 1.5 seconds
+            setTimeout(() => {
+                header.classList.remove('slide-hidden');
+            }, 1500);
         }
 
         function updateNavigationButtons() {
