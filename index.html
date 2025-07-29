@@ -40,6 +40,15 @@
             transform: translateY(-50%);
         }
 
+        .header h1 {
+            text-align: center;
+            color: #667eea;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-shadow: none;
+            letter-spacing: -0.5px;
+        }
 
         .date-navigation {
             display: flex;
@@ -116,7 +125,7 @@
         .content {
             max-width: 100%;
             margin: 0;
-            padding: 20px 15px 30px 15px;
+            padding: 10px 15px 30px 15px;
         }
 
         .quiz-container {
@@ -503,17 +512,20 @@
             .quiz-container {
                 margin: 0 5px;
                 border-radius: 20px;
-                min-height: 600px;
+                min-height: auto;
             }
             
             .quiz-slides {
-                height: 500px;
+                height: auto;
+                min-height: 350px;
             }
             
             .quiz-slide {
                 padding: 20px 15px;
-                height: 100%;
-                overflow-y: auto;
+                height: auto;
+                min-height: 350px;
+                overflow-y: visible;
+                position: relative;
             }
             
             .question-content {
@@ -521,12 +533,13 @@
                 display: flex;
                 flex-direction: column;
                 min-height: 0;
-                padding-bottom: 80px; /* Space for navigation */
+                padding-bottom: 0;
             }
             
             .quiz-options {
                 flex: 1;
                 margin-bottom: 15px;
+                gap: 8px;
             }
             
             .quiz-option {
@@ -545,17 +558,17 @@
             }
             
             .slide-navigation {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(255, 255, 255, 0.95);
-                backdrop-filter: blur(10px);
-                padding: 15px;
+                position: relative;
+                bottom: auto;
+                left: auto;
+                right: auto;
+                background: transparent;
+                backdrop-filter: none;
+                padding: 10px 0 0 0;
                 border-top: 1px solid #e2e8f0;
                 margin-top: 0;
-                border-radius: 0 0 20px 20px;
-                box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+                border-radius: 0;
+                box-shadow: none;
             }
             
             .nav-btn {
@@ -572,19 +585,17 @@
             }
             
             .content {
-                padding: 15px 10px 25px 10px;
+                padding: 5px 10px 25px 10px;
+            }
+            
+            .question-number {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+                margin-right: 12px;
             }
             
             .quiz-question {
                 font-size: 1.1rem;
-                margin-bottom: 20px;
-            }
-            
-            .question-number {
-                width: 30px;
-                height: 30px;
-                line-height: 30px;
-                font-size: 0.8rem;
                 margin-bottom: 15px;
             }
         }
@@ -592,6 +603,7 @@
 </head>
 <body>
     <div class="header">
+        <h1>🧠 Daily Quiz</h1>
         <div class="date-navigation">
             <div class="date-scroll" id="dateScroll"></div>
         </div>
