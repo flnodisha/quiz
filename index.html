@@ -154,35 +154,34 @@
             width: 0%;
         }
 
-        .quiz-slides {
-            position: relative;
-            height: 400px;
-            overflow: hidden;
-        }
+       .quiz-slides {
+      position: relative;
+      height: auto;
+      max-height: 500px;
+      overflow-y: auto;
+    }
 
-        .quiz-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            padding: 30px;
-            opacity: 0;
-            transform: translateX(100%);
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+    .quiz-slide {
+      position: relative;
+      width: 100%;
+      min-height: 500px;
+      padding: 30px;
+      opacity: 0;
+      transform: translateX(100%);
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
 
-        .quiz-slide.active {
-            opacity: 1;
-            transform: translateX(0);
-        }
+    .quiz-slide.active {
+      opacity: 1;
+      transform: translateX(0);
+    }
 
-        .quiz-slide.prev {
-            transform: translateX(-100%);
-        }
+    .quiz-slide.prev {
+      transform: translateX(-100%);
+    }
 
         .question-content {
             flex: 1;
@@ -483,18 +482,18 @@
 </head>
 <body>
     <div class="header">
-        <div class="date-navigation">
-            <div class="date-scroll" id="dateScroll"></div>
-        </div>
+    <div class="date-navigation">
+      <div class="date-scroll" id="dateScroll"></div>
     </div>
+  </div>
 
-    <div class="content">
-        <div class="quiz-container">
-            <div id="quizContent">
-                <div class="loading">Loading quiz...</div>
-            </div>
-        </div>
+  <div class="content">
+    <div class="quiz-container">
+      <div id="quizContent">
+        <div class="loading">Loading quiz...</div>
+      </div>
     </div>
+  </div>
 
     <script>
         let currentQuizzes = [];
