@@ -1,0 +1,22 @@
+{
+  "questions": [
+    {
+      "question": "What is the capital of India?",
+      "options": ["Mumbai", "New Delhi", "Kolkata", "Chennai"],
+      "correctAnswer": 1,
+      "explanation": "New Delhi is the capital and seat of government of India."
+    },
+    {
+      "question": "Which planet is known as the Red Planet?",
+      "options": ["Venus", "Mars", "Jupiter", "Saturn"],
+      "correctAnswer": 1,
+      "explanation": "Mars appears red due to iron oxide (rust) on its surface."
+    },
+    {
+      "question": "Who invented the telephone?",
+      "options": ["Thomas Edison", "Alexander Graham Bell", "Nikola Tesla", "Benjamin Franklin"],
+      "correctAnswer": 1,
+      "explanation": "Alexander Graham Bell is credited with inventing the first practical telephone in 1876."
+    }
+  ]
+}
